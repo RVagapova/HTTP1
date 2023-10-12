@@ -10,17 +10,15 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 public class Main {
-    public static final String URL = "https://raw.githubusercontent.com/netology-code/jd-homeworks/master/http/task1/cats";
+    public static final String URL = "https://api.nasa.gov/planetary/apod?api_key=N4U2dRRoBtM5llrwjUmiXfnIOel1uZcUsXZPj1uA";
 
     public static ObjectMapper mapper = new ObjectMapper();
-
-    public Main() throws IOException {
-    }
 
     public static void main(String[] args) throws IOException {
         //создание клиента
@@ -39,10 +37,21 @@ public class Main {
         CloseableHttpResponse response = client.execute(request);
 
         InputStream content  = response.getEntity().getContent();
+        Post post = mapper.readValue(content, new TypeReference<>() {});
+        //считать массив байт из url
+        byte[] urlResult = post.getUrl().getBytes();
 
-        List<Post> posts = mapper.readValue(content, new TypeReference<>() {});
-        posts.stream()
-                .filter(post -> post.getUpvotes() != null)
-                .forEach(System.out::println);
+        //имя файла
+        String[] fileName = post.getUrl().split("/");
+
+        //сохранить массив как файл
+        try {
+            FileOutputStream fos = new FileOutputStream(fileName[fileName.length - 1]);
+            fos.write(urlResult);
+            fos.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
