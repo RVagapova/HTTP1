@@ -48,6 +48,7 @@ public class Post {
     public String getCopyright() {
         return copyright;
     }
+
     public String getDate() {
         return date;
     }
